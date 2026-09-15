@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -14,6 +15,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 connectDB();
 
 const app = express();
+
 app.set("trust proxy", 1);
 
 app.use(helmet());
@@ -28,14 +30,16 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin(origin, callback) {
+    origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
+        callback(null, true);
+      } else {
+        callback(new Error("CORS: origin not allowed"));
       }
-
-      return callback(new Error("CORS: origin not allowed"));
     },
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
